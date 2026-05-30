@@ -1,5 +1,6 @@
 package io.openrise.stegorouter.carrier.image
 
+import io.openrise.stegorouter.carrier.BoundaryValidator
 import io.openrise.stegorouter.carrier.FileType
 import io.openrise.stegorouter.config.ImageStegoConfig
 import java.io.ByteArrayInputStream
@@ -32,9 +33,7 @@ class PngCarrier(
         require(bitDepth == 8) { "Only 8-bit PNG supported" }
 
         val capacityBytes = calculateCapacityBits(width, height, channels) / 8
-        require(payload.size <= capacityBytes) {
-            "Payload too large: ${payload.size} > $capacityBytes"
-        }
+        BoundaryValidator.validateCapacity(payload.size, capacityBytes, "PNG")
 
         val idatChunks = chunks.filter { it.type == "IDAT" }
         val compressedData = idatChunks.fold(ByteArray(0)) { acc, chunk -> acc + chunk.data }

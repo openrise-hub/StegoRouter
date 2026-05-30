@@ -1,5 +1,6 @@
 package io.openrise.stegorouter.carrier.audio
 
+import io.openrise.stegorouter.carrier.BoundaryValidator
 import io.openrise.stegorouter.carrier.CarrierAlgorithm
 import io.openrise.stegorouter.carrier.FileType
 
@@ -27,9 +28,7 @@ class WavCarrier : CarrierAlgorithm {
         val numSamples = dataSize / (bitsPerSample / 8)
 
         val capacityBytes = numSamples
-        require(payload.size <= capacityBytes) {
-            "Payload too large: ${payload.size} > $capacityBytes"
-        }
+        BoundaryValidator.validateCapacity(payload.size, capacityBytes.toLong(), "WAV")
 
         val result = carrier.clone()
         val sampleStart = dataOffset + 8

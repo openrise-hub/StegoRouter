@@ -1,5 +1,6 @@
 package io.openrise.stegorouter.carrier.image
 
+import io.openrise.stegorouter.carrier.BoundaryValidator
 import io.openrise.stegorouter.carrier.CarrierAlgorithm
 import io.openrise.stegorouter.config.ImageStegoConfig
 
@@ -57,22 +58,23 @@ abstract class ImageCarrierAlgorithm(
         val mask = (1 shl config.bitsPerChannel) - 1
         val shift = channelBit
 
-        return when (config.lsbMode) {
+        val modified = when (config.lsbMode) {
             LsbMode.REPLACEMENT -> {
                 val cleared = value and (mask.inv() shl shift)
-                val modified = cleared or ((bit and mask) shl shift)
-                (modified and 0xFF).toByte()
+                cleared or ((bit and mask) shl shift)
             }
             LsbMode.MATCHING -> {
                 val currentBit = (value shr shift) and 1
                 if (currentBit != bit) {
                     val delta = if (value < 128) 1 else -1
-                    ((value + delta) and 0xFF).toByte()
+                    value + delta
                 } else {
-                    pixel
+                    value
                 }
             }
         }
+
+        return BoundaryValidator.clampPixelValue(modified).toByte()
     }
 
     private fun extractBit(pixel: Byte, channelBit: Int): Int {

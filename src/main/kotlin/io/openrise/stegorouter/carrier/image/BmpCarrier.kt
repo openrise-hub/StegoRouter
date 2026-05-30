@@ -1,5 +1,6 @@
 package io.openrise.stegorouter.carrier.image
 
+import io.openrise.stegorouter.carrier.BoundaryValidator
 import io.openrise.stegorouter.carrier.FileType
 import io.openrise.stegorouter.config.ImageStegoConfig
 
@@ -28,9 +29,7 @@ class BmpCarrier(
         val padding = rowSize - width * channels
 
         val capacityBytes = calculateCapacityBits(width, absHeight, channels) / 8
-        require(payload.size <= capacityBytes) {
-            "Payload too large: ${payload.size} > $capacityBytes"
-        }
+        BoundaryValidator.validateCapacity(payload.size, capacityBytes, "BMP")
 
         val result = carrier.clone()
         var bitIndex = 0
