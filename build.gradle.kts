@@ -22,6 +22,7 @@ dependencies {
     implementation("org.bouncycastle:bcpkix-jdk18on:1.78.1")
     
     testImplementation(kotlin("test"))
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
 }
 
 tasks.test {
