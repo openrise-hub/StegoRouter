@@ -23,6 +23,7 @@ dependencies {
     
     testImplementation(kotlin("test"))
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
+    testImplementation("org.assertj:assertj-core:3.26.3")
 }
 
 tasks.test {
