@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "1.9.25"
     application
+    id("org.graalvm.buildtools.native") version "0.10.2"
 }
 
 group = "io.openrise.stegorouter"
@@ -30,4 +31,15 @@ kotlin {
 
 application {
     mainClass.set("io.openrise.stegorouter.MainKt")
+}
+
+graalvmNative {
+    binaries {
+        named("main") {
+            imageName.set("stegorouter")
+            mainClass.set("io.openrise.stegorouter.MainKt")
+            buildArgs.add("--no-fallback")
+            buildArgs.add("--enable-url-protocols=http,https")
+        }
+    }
 }
