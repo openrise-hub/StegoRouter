@@ -58,8 +58,16 @@ graalvmNative {
         named("main") {
             imageName.set("stegorouter")
             mainClass.set("io.openrise.stegorouter.ui.StegoRouterAppKt")
-            buildArgs.add("--no-fallback")
-            buildArgs.add("--enable-url-protocols=http,https")
+            buildArgs.addAll(
+                "--no-fallback",
+                "--enable-url-protocols=http,https",
+                "--initialize-at-build-time",
+                "-H:+ReportExceptionStackTraces",
+                "--allow-incomplete-classpath"
+            )
         }
+    }
+    agent {
+        defaultMode.set("standard")
     }
 }
