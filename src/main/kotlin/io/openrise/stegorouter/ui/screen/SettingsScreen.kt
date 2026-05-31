@@ -63,9 +63,9 @@ class SettingsScreen : Screen {
                 .build()
             frame.renderWidget(inputLabel, editChunks[0])
 
-            val input = TextInput.builder()
+            val inputBuilder = TextInput.builder()
                 .placeholder("Enter value...")
-                .masked().build()
+            val input = if (editingIndex == 0) inputBuilder.masked().build() else inputBuilder.build()
             frame.renderStatefulWidget(input, editChunks[1], inputState)
         } else {
             val help = Paragraph.builder()
