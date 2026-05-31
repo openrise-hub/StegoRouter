@@ -13,11 +13,16 @@ import kotlin.system.exitProcess
 
 @Command(
     name = "stegorouter",
-    mixinStandardHelpOptions = true,
     version = ["StegoRouter 1.0"],
     description = ["Steganography tool for embedding and extracting payloads in various file formats"]
 )
 class StegoRouterApp : Callable<Int> {
+
+    @Option(names = ["-h", "--help"], usageHelp = true, description = ["Show help"])
+    var help: Boolean = false
+
+    @Option(names = ["-V", "--version"], versionHelp = true, description = ["Show version"])
+    var version: Boolean = false
 
     @Option(names = ["-e", "--embed"], description = ["Embed payload into carrier"])
     var embedMode: Boolean = false
@@ -49,7 +54,7 @@ class StegoRouterApp : Callable<Int> {
     }
 
     private fun hasCliArgs(): Boolean {
-        return embedMode || extractMode || carrierFile != null || payload != null || password != null || outputFile != null || batchFiles != null
+        return help || version || embedMode || extractMode || carrierFile != null || payload != null || password != null || outputFile != null || batchFiles != null
     }
 
     private fun runHeadless(): Int {
