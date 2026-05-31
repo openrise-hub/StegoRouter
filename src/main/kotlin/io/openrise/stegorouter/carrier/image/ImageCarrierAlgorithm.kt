@@ -53,7 +53,7 @@ abstract class ImageCarrierAlgorithm(
         return result
     }
 
-    private fun modifyPixelValue(pixel: Byte, bit: Int, channelBit: Int): Byte {
+    protected fun modifyPixelValue(pixel: Byte, bit: Int, channelBit: Int): Byte {
         val value = pixel.toInt() and 0xFF
         val mask = (1 shl config.bitsPerChannel) - 1
         val shift = channelBit
@@ -77,7 +77,7 @@ abstract class ImageCarrierAlgorithm(
         return BoundaryValidator.clampPixelValue(modified).toByte()
     }
 
-    private fun extractBit(pixel: Byte, channelBit: Int): Int {
+    protected fun extractBit(pixel: Byte, channelBit: Int): Int {
         val value = pixel.toInt() and 0xFF
         return (value shr channelBit) and 1
     }

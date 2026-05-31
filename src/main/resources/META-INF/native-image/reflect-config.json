@@ -1,0 +1,53 @@
+[
+  {
+    "name": "org.bouncycastle.jce.provider.BouncyCastleProvider",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true,
+    "allPublicFields": true
+  },
+  {
+    "name": "org.bouncycastle.jcajce.provider.symmetric.AES",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "org.bouncycastle.jcajce.provider.digest.SHA256",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true
+  },
+  {
+    "name": "dev.tamboui.**",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true,
+    "allPublicFields": true
+  },
+  {
+    "name": "io.openrise.stegorouter.**",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true,
+    "allDeclaredFields": true,
+    "allPublicFields": true
+  },
+  {
+    "name": "com.google.gson.**",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true
+  },
+  {
+    "name": "picocli.**",
+    "allDeclaredConstructors": true,
+    "allPublicConstructors": true,
+    "allDeclaredMethods": true,
+    "allPublicMethods": true
+  }
+]

@@ -15,11 +15,26 @@ java {
 
 repositories {
     mavenCentral()
+    maven {
+        url = uri("https://central.sonatype.com/repository/maven-snapshots/")
+        mavenContent {
+            snapshotsOnly()
+        }
+    }
 }
 
 dependencies {
     implementation("org.bouncycastle:bcprov-jdk18on:1.78.1")
     implementation("org.bouncycastle:bcpkix-jdk18on:1.78.1")
+    
+    implementation("dev.tamboui:tamboui-tui:0.3.0")
+    implementation("dev.tamboui:tamboui-toolkit:0.3.0")
+    implementation("dev.tamboui:tamboui-jline3-backend:0.3.0")
+    implementation("dev.tamboui:tamboui-picocli:0.3.0")
+    implementation("info.picocli:picocli:4.7.6")
+    annotationProcessor("info.picocli:picocli-codegen:4.7.6")
+    
+    implementation("com.google.code.gson:gson:2.10.1")
     
     testImplementation(kotlin("test"))
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
@@ -35,16 +50,25 @@ kotlin {
 }
 
 application {
-    mainClass.set("io.openrise.stegorouter.MainKt")
+    mainClass.set("io.openrise.stegorouter.ui.StegoRouterAppKt")
 }
 
 graalvmNative {
     binaries {
         named("main") {
             imageName.set("stegorouter")
-            mainClass.set("io.openrise.stegorouter.MainKt")
-            buildArgs.add("--no-fallback")
-            buildArgs.add("--enable-url-protocols=http,https")
+            mainClass.set("io.openrise.stegorouter.ui.StegoRouterAppKt")
+            buildArgs.addAll(
+                "--no-fallback",
+                "--enable-url-protocols=http,https",
+                "-H:+ReportExceptionStackTraces",
+                "--initialize-at-run-time=sun.awt.X11.XWM",
+                "--initialize-at-run-time=sun.awt.X11.XToolkit",
+                "--initialize-at-run-time=sun.java2d.SunGraphicsEnvironment"
+            )
         }
+    }
+    agent {
+        defaultMode.set("standard")
     }
 }
