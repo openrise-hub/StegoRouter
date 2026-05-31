@@ -61,9 +61,10 @@ graalvmNative {
             buildArgs.addAll(
                 "--no-fallback",
                 "--enable-url-protocols=http,https",
-                "--initialize-at-build-time",
                 "-H:+ReportExceptionStackTraces",
-                "--allow-incomplete-classpath"
+                "--initialize-at-run-time=sun.awt.X11.XWM",
+                "--initialize-at-run-time=sun.awt.X11.XToolkit",
+                "--initialize-at-run-time=sun.java2d.SunGraphicsEnvironment"
             )
         }
     }

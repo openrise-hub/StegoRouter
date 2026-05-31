@@ -11,15 +11,16 @@ import dev.tamboui.widgets.input.TextInput
 import dev.tamboui.widgets.input.TextInputState
 import dev.tamboui.widgets.paragraph.Paragraph
 import io.openrise.stegorouter.ui.AppState
+import io.openrise.stegorouter.ui.FileDialogUtil
 import io.openrise.stegorouter.ui.PayloadSource
 import io.openrise.stegorouter.ui.ScreenType
-import java.awt.FileDialog
-import java.awt.Frame as AwtFrame
 import java.io.File
 
 class PayloadInputScreen : Screen {
     private val textInputState = TextInputState()
+    private val pathInputState = TextInputState()
     private var mode = PayloadSource.TEXT
+    private var useTextPath = false
 
     override fun render(frame: Frame, state: AppState) {
         val chunks = Layout.vertical()
@@ -48,16 +49,15 @@ class PayloadInputScreen : Screen {
                 .placeholder("Enter payload text...")
                 .build()
             frame.renderStatefulWidget(input, chunks[2], textInputState)
-        } else {
-            val message = if (state.payload != null) {
-                "File selected: ${state.payload.size} bytes\n\nPress Enter to continue"
-            } else {
-                "Press Enter to select payload file"
-            }
-            val content = Paragraph.builder()
-                .text(Text.from(message))
-                .build()
+        } else if (state.payload != null) {
+            val message = "File selected: ${state.payload.size} bytes\n\nPress Enter to continue"
+            val content = Paragraph.builder().text(Text.from(message)).build()
             frame.renderWidget(content, chunks[2])
+        } else {
+            val input = TextInput.builder()
+                .placeholder("Enter file path or press Enter to browse...")
+                .build()
+            frame.renderStatefulWidget(input, chunks[2], pathInputState)
         }
 
         val help = Paragraph.builder()
@@ -90,32 +90,36 @@ class PayloadInputScreen : Screen {
                     } else {
                         state
                     }
+                } else if (state.payload != null) {
+                    state.copy(payloadSource = PayloadSource.FILE, currentScreen = ScreenType.PASSWORD)
                 } else {
-                    openFilePicker(state)
+                    val path = pathInputState.text()
+                    if (path.isNotEmpty()) {
+                        val file = File(path)
+                        if (file.exists()) {
+                            state.copy(
+                                payload = file.readBytes(),
+                                payloadSource = PayloadSource.FILE,
+                                currentScreen = ScreenType.PASSWORD
+                            )
+                        } else {
+                            state
+                        }
+                    } else {
+                        val files = FileDialogUtil.chooseFile("Select Payload File")
+                        if (files != null && files.isNotEmpty()) {
+                            state.copy(
+                                payload = files.first().readBytes(),
+                                payloadSource = PayloadSource.FILE,
+                                currentScreen = ScreenType.PASSWORD
+                            )
+                        } else {
+                            state
+                        }
+                    }
                 }
             }
             else -> state
-        }
-    }
-
-    private fun openFilePicker(state: AppState): AppState {
-        val dialog = FileDialog(null as AwtFrame?, "Select Payload File", FileDialog.LOAD)
-        dialog.isVisible = true
-
-        val file = if (dialog.file != null) {
-            File(dialog.directory, dialog.file)
-        } else {
-            null
-        }
-
-        return if (file != null && file.exists()) {
-            state.copy(
-                payload = file.readBytes(),
-                payloadSource = PayloadSource.FILE,
-                currentScreen = ScreenType.PASSWORD
-            )
-        } else {
-            state
         }
     }
 }

@@ -13,9 +13,9 @@ import dev.tamboui.widgets.paragraph.Paragraph
 import io.openrise.stegorouter.ui.AppState
 import io.openrise.stegorouter.ui.BatchItem
 import io.openrise.stegorouter.ui.BatchStatus
+import io.openrise.stegorouter.ui.FileDialogUtil
+import io.openrise.stegorouter.ui.Operation
 import io.openrise.stegorouter.ui.ScreenType
-import java.awt.FileDialog
-import java.awt.Frame as AwtFrame
 import java.io.File
 
 class BatchQueueScreen : Screen {
@@ -85,18 +85,10 @@ class BatchQueueScreen : Screen {
     }
 
     private fun addFilesToQueue(state: AppState): AppState {
-        val dialog = FileDialog(null as AwtFrame?, "Select Carrier Files", FileDialog.LOAD)
-        dialog.isMultipleMode = true
-        dialog.isVisible = true
-
-        val files = dialog.files
+        val files = FileDialogUtil.chooseFile("Select Carrier Files", multiple = true)
         if (files != null && files.isNotEmpty()) {
             val newItems = files.map { file ->
-                BatchItem(
-                    carrierFile = file,
-                    operation = io.openrise.stegorouter.ui.Operation.EMBED,
-                    status = BatchStatus.PENDING
-                )
+                BatchItem(carrierFile = file, operation = Operation.EMBED, status = BatchStatus.PENDING)
             }
             val newQueue = state.batchQueue.toMutableList()
             newQueue.addAll(newItems)
