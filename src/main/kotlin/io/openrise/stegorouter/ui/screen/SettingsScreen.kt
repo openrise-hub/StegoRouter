@@ -1,20 +1,17 @@
 package io.openrise.stegorouter.ui.screen
 
+import dev.tamboui.layout.Alignment
 import dev.tamboui.layout.Constraint
 import dev.tamboui.layout.Layout
-import dev.tamboui.style.Color
-import dev.tamboui.style.Style
 import dev.tamboui.terminal.Frame
 import dev.tamboui.text.Text
-import dev.tamboui.tui.Keys
 import dev.tamboui.tui.TuiRunner
 import dev.tamboui.tui.event.KeyEvent
-import dev.tamboui.widgets.list.List
+import dev.tamboui.widgets.input.TextInput
+import dev.tamboui.widgets.input.TextInputState
 import dev.tamboui.widgets.list.ListState
+import dev.tamboui.widgets.list.ListWidget
 import dev.tamboui.widgets.paragraph.Paragraph
-import dev.tamboui.widgets.textinput.TextInput
-import dev.tamboui.widgets.textinput.TextInputState
-import io.openrise.stegorouter.config.AppConfig
 import io.openrise.stegorouter.ui.AppState
 import io.openrise.stegorouter.ui.ConfigManager
 import io.openrise.stegorouter.ui.ScreenType
@@ -25,62 +22,57 @@ class SettingsScreen : Screen {
     private var editingIndex: Int? = null
     private val settings = listOf("Default Password", "Default Output Directory")
 
-    init {
-        listState.select(0)
-    }
-
     override fun render(frame: Frame, state: AppState) {
         val chunks = Layout.vertical()
             .constraints(
                 Constraint.length(3),
                 Constraint.min(0),
-                Constraint.length(3),
                 Constraint.length(3)
             )
             .split(frame.area())
 
         val title = Paragraph.builder()
-            .text(Text.from("Settings").style(Style.DEFAULT.fg(Color.Cyan).bold()))
-            .alignment(dev.tamboui.layout.Alignment.CENTER)
+            .text(Text.from("Settings"))
+            .alignment(Alignment.CENTER)
             .build()
         frame.renderWidget(title, chunks[0])
 
         val config = ConfigManager.load()
-        val items = listOf(
-            Text.from("Default Password: ${if (config.defaultPassword != null) "********" else "(not set)"}"),
-            Text.from("Default Output Directory: ${config.defaultOutputDir}")
+        val items = arrayOf(
+            "Default Password: ${if (config.defaultPassword != null) "********" else "(not set)"}",
+            "Default Output Directory: ${config.defaultOutputDir}"
         )
 
-        val list = List.builder()
-            .items(items)
-            .highlightStyle(Style.DEFAULT.fg(Color.Yellow).bold())
+        val list = ListWidget.builder()
+            .items(*items)
             .highlightSymbol("> ")
             .build()
         frame.renderStatefulWidget(list, chunks[1], listState)
 
         if (editingIndex != null) {
+            val editChunks = Layout.vertical()
+                .constraints(
+                    Constraint.length(3),
+                    Constraint.min(0)
+                )
+                .split(chunks[2])
+
             val label = if (editingIndex == 0) "Enter new password:" else "Enter output directory:"
             val inputLabel = Paragraph.builder()
-                .text(Text.from(label).style(Style.DEFAULT.fg(Color.White)))
+                .text(Text.from(label))
                 .build()
-            frame.renderWidget(inputLabel, chunks[2])
+            frame.renderWidget(inputLabel, editChunks[0])
 
             val input = TextInput.builder()
                 .placeholder("Enter value...")
-                .password(editingIndex == 0)
-                .build()
-            frame.renderStatefulWidget(input, chunks[3], inputState)
+                .masked().build()
+            frame.renderStatefulWidget(input, editChunks[1], inputState)
         } else {
             val help = Paragraph.builder()
-                .text(Text.from("Enter: Edit | Esc: Back").style(Style.DEFAULT.fg(Color.Gray)))
-                .alignment(dev.tamboui.layout.Alignment.CENTER)
+                .text(Text.from("Enter: Edit | Esc: Back"))
+                .alignment(Alignment.CENTER)
                 .build()
             frame.renderWidget(help, chunks[2])
-
-            val spacer = Paragraph.builder()
-                .text(Text.from(""))
-                .build()
-            frame.renderWidget(spacer, chunks[3])
         }
     }
 
@@ -88,32 +80,28 @@ class SettingsScreen : Screen {
         if (event !is KeyEvent) return state
 
         return when {
-            Keys.isEscape(event) -> {
+            event.isCancel() -> {
                 if (editingIndex != null) {
                     editingIndex = null
-                    inputState.setValue("")
+                    inputState.clear()
                     state
                 } else {
                     state.copy(currentScreen = ScreenType.MAIN_MENU)
                 }
             }
-            Keys.isUp(event) && editingIndex == null -> {
-                val current = listState.selected ?: 0
-                val newIndex = if (current > 0) current - 1 else settings.size - 1
-                listState.select(newIndex)
+            event.isUp() && editingIndex == null -> {
+                listState.selectPrevious()
                 state
             }
-            Keys.isDown(event) && editingIndex == null -> {
-                val current = listState.selected ?: 0
-                val newIndex = if (current < settings.size - 1) current + 1 else 0
-                listState.select(newIndex)
+            event.isDown() && editingIndex == null -> {
+                listState.selectNext(settings.size)
                 state
             }
-            Keys.isSelect(event) -> {
+            event.isSelect() -> {
                 if (editingIndex != null) {
                     saveSetting(state)
                 } else {
-                    editingIndex = listState.selected
+                    editingIndex = listState.selected()
                     state
                 }
             }
@@ -123,7 +111,7 @@ class SettingsScreen : Screen {
 
     private fun saveSetting(state: AppState): AppState {
         val config = ConfigManager.load()
-        val value = inputState.value
+        val value = inputState.text()
 
         val newConfig = when (editingIndex) {
             0 -> config.copy(defaultPassword = if (value.isNotEmpty()) value else null)
@@ -133,7 +121,7 @@ class SettingsScreen : Screen {
 
         ConfigManager.save(newConfig)
         editingIndex = null
-        inputState.setValue("")
+        inputState.clear()
         return state
     }
 }

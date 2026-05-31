@@ -1,21 +1,18 @@
 package io.openrise.stegorouter.ui.screen
 
+import dev.tamboui.layout.Alignment
 import dev.tamboui.layout.Constraint
 import dev.tamboui.layout.Layout
-import dev.tamboui.style.Color
-import dev.tamboui.style.Style
 import dev.tamboui.terminal.Frame
 import dev.tamboui.text.Text
-import dev.tamboui.tui.Keys
 import dev.tamboui.tui.TuiRunner
 import dev.tamboui.tui.event.KeyEvent
-import dev.tamboui.widgets.list.List
 import dev.tamboui.widgets.list.ListState
+import dev.tamboui.widgets.list.ListWidget
 import dev.tamboui.widgets.paragraph.Paragraph
 import io.openrise.stegorouter.ui.AppState
 import io.openrise.stegorouter.ui.BatchItem
 import io.openrise.stegorouter.ui.BatchStatus
-import io.openrise.stegorouter.ui.Operation
 import io.openrise.stegorouter.ui.ScreenType
 import java.awt.FileDialog
 import java.awt.Frame as AwtFrame
@@ -34,13 +31,13 @@ class BatchQueueScreen : Screen {
             .split(frame.area())
 
         val title = Paragraph.builder()
-            .text(Text.from("Batch Queue").style(Style.DEFAULT.fg(Color.Cyan).bold()))
-            .alignment(dev.tamboui.layout.Alignment.CENTER)
+            .text(Text.from("Batch Queue"))
+            .alignment(Alignment.CENTER)
             .build()
         frame.renderWidget(title, chunks[0])
 
         val items = if (state.batchQueue.isEmpty()) {
-            listOf(Text.from("No items in queue - Press 'a' to add files"))
+            arrayOf("No items in queue - Press 'a' to add files")
         } else {
             state.batchQueue.map { item ->
                 val statusIcon = when (item.status) {
@@ -49,20 +46,19 @@ class BatchQueueScreen : Screen {
                     BatchStatus.COMPLETE -> "[+]"
                     BatchStatus.FAILED -> "[X]"
                 }
-                Text.from("$statusIcon ${item.carrierFile.name} (${item.operation})")
-            }
+                "$statusIcon ${item.carrierFile.name} (${item.operation})"
+            }.toTypedArray()
         }
 
-        val list = List.builder()
-            .items(items)
-            .highlightStyle(Style.DEFAULT.fg(Color.Yellow).bold())
+        val list = ListWidget.builder()
+            .items(*items)
             .highlightSymbol("> ")
             .build()
         frame.renderStatefulWidget(list, chunks[1], listState)
 
         val help = Paragraph.builder()
-            .text(Text.from("a: Add | d: Delete | Enter: Process | Esc: Back").style(Style.DEFAULT.fg(Color.Gray)))
-            .alignment(dev.tamboui.layout.Alignment.CENTER)
+            .text(Text.from("a: Add | Enter: Process | Esc: Back"))
+            .alignment(Alignment.CENTER)
             .build()
         frame.renderWidget(help, chunks[2])
     }
@@ -71,23 +67,13 @@ class BatchQueueScreen : Screen {
         if (event !is KeyEvent) return state
 
         return when {
-            Keys.isEscape(event) -> {
+            event.isCancel() -> {
                 state.copy(currentScreen = ScreenType.MAIN_MENU)
             }
-            event.key == "a" -> {
+            event.isChar('a') -> {
                 addFilesToQueue(state)
             }
-            event.key == "d" -> {
-                val selected = listState.selected
-                if (selected != null && selected < state.batchQueue.size) {
-                    val newQueue = state.batchQueue.toMutableList()
-                    newQueue.removeAt(selected)
-                    state.copy(batchQueue = newQueue)
-                } else {
-                    state
-                }
-            }
-            Keys.isSelect(event) -> {
+            event.isSelect() -> {
                 if (state.batchQueue.isNotEmpty()) {
                     state.copy(currentScreen = ScreenType.PROCESSING)
                 } else {
@@ -108,7 +94,7 @@ class BatchQueueScreen : Screen {
             val newItems = files.map { file ->
                 BatchItem(
                     carrierFile = file,
-                    operation = Operation.EMBED,
+                    operation = io.openrise.stegorouter.ui.Operation.EMBED,
                     status = BatchStatus.PENDING
                 )
             }

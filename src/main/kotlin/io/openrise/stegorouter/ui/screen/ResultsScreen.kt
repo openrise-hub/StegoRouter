@@ -1,12 +1,10 @@
 package io.openrise.stegorouter.ui.screen
 
+import dev.tamboui.layout.Alignment
 import dev.tamboui.layout.Constraint
 import dev.tamboui.layout.Layout
-import dev.tamboui.style.Color
-import dev.tamboui.style.Style
 import dev.tamboui.terminal.Frame
 import dev.tamboui.text.Text
-import dev.tamboui.tui.Keys
 import dev.tamboui.tui.TuiRunner
 import dev.tamboui.tui.event.KeyEvent
 import dev.tamboui.widgets.paragraph.Paragraph
@@ -25,15 +23,10 @@ class ResultsScreen : Screen {
 
         val result = state.lastResult
         val titleText = if (result?.success == true) "Success" else "Failed"
-        val titleStyle = if (result?.success == true) {
-            Style.DEFAULT.fg(Color.Green).bold()
-        } else {
-            Style.DEFAULT.fg(Color.Red).bold()
-        }
 
         val title = Paragraph.builder()
-            .text(Text.from(titleText).style(titleStyle))
-            .alignment(dev.tamboui.layout.Alignment.CENTER)
+            .text(Text.from(titleText))
+            .alignment(Alignment.CENTER)
             .build()
         frame.renderWidget(title, chunks[0])
 
@@ -55,13 +48,13 @@ class ResultsScreen : Screen {
         }
 
         val content = Paragraph.builder()
-            .text(Text.from(details).style(Style.DEFAULT.fg(Color.White)))
+            .text(Text.from(details))
             .build()
         frame.renderWidget(content, chunks[1])
 
         val help = Paragraph.builder()
-            .text(Text.from("Enter: Main Menu | q: Quit").style(Style.DEFAULT.fg(Color.Gray)))
-            .alignment(dev.tamboui.layout.Alignment.CENTER)
+            .text(Text.from("Enter: Main Menu | q: Quit"))
+            .alignment(Alignment.CENTER)
             .build()
         frame.renderWidget(help, chunks[2])
     }
@@ -70,11 +63,11 @@ class ResultsScreen : Screen {
         if (event !is KeyEvent) return state
 
         return when {
-            Keys.isQuit(event) -> {
+            event.isQuit() -> {
                 runner.quit()
                 state
             }
-            Keys.isSelect(event) -> {
+            event.isSelect() -> {
                 state.copy(
                     currentScreen = ScreenType.MAIN_MENU,
                     carrierFile = null,

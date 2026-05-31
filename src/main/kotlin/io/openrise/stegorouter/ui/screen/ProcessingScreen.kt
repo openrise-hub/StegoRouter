@@ -1,18 +1,15 @@
 package io.openrise.stegorouter.ui.screen
 
+import dev.tamboui.layout.Alignment
 import dev.tamboui.layout.Constraint
 import dev.tamboui.layout.Layout
-import dev.tamboui.style.Color
-import dev.tamboui.style.Style
 import dev.tamboui.terminal.Frame
 import dev.tamboui.text.Text
-import dev.tamboui.tui.Keys
 import dev.tamboui.tui.TuiRunner
-import dev.tamboui.tui.event.KeyEvent
 import dev.tamboui.tui.event.TickEvent
 import dev.tamboui.widgets.gauge.Gauge
 import dev.tamboui.widgets.paragraph.Paragraph
-import io.openrise.stegorouter.carrier.CarrierAlgorithm
+import io.openrise.stegorouter.carrier.FileType
 import io.openrise.stegorouter.carrier.archive.ZipCarrier
 import io.openrise.stegorouter.carrier.audio.WavCarrier
 import io.openrise.stegorouter.carrier.document.PdfCarrier
@@ -47,32 +44,30 @@ class ProcessingScreen : Screen {
             .split(frame.area())
 
         val title = Paragraph.builder()
-            .text(Text.from("Processing").style(Style.DEFAULT.fg(Color.Cyan).bold()))
-            .alignment(dev.tamboui.layout.Alignment.CENTER)
+            .text(Text.from("Processing"))
+            .alignment(Alignment.CENTER)
             .build()
         frame.renderWidget(title, chunks[0])
 
         val statusWidget = Paragraph.builder()
-            .text(Text.from(status).style(Style.DEFAULT.fg(Color.Yellow)))
-            .alignment(dev.tamboui.layout.Alignment.CENTER)
+            .text(Text.from(status))
             .build()
         frame.renderWidget(statusWidget, chunks[1])
 
         val gauge = Gauge.builder()
             .ratio(progress)
             .label("${(progress * 100).toInt()}%")
-            .gaugeStyle(Style.DEFAULT.fg(Color.Green))
             .build()
         frame.renderWidget(gauge, chunks[2])
 
         val details = Paragraph.builder()
-            .text(Text.from("Operation: ${if (state.operation == Operation.EMBED) "Embed" else "Extract"}\nCarrier: ${state.carrierFile?.name ?: "N/A"}").style(Style.DEFAULT.fg(Color.White)))
+            .text(Text.from("Operation: ${if (state.operation == Operation.EMBED) "Embed" else "Extract"}\nCarrier: ${state.carrierFile?.name ?: "N/A"}"))
             .build()
         frame.renderWidget(details, chunks[3])
 
         val help = Paragraph.builder()
-            .text(Text.from("Please wait...").style(Style.DEFAULT.fg(Color.Gray)))
-            .alignment(dev.tamboui.layout.Alignment.CENTER)
+            .text(Text.from("Please wait..."))
+            .alignment(Alignment.CENTER)
             .build()
         frame.renderWidget(help, chunks[4])
     }
@@ -82,10 +77,7 @@ class ProcessingScreen : Screen {
             processing = true
             startTime = System.currentTimeMillis()
             val result = processOperation(state)
-            return state.copy(
-                lastResult = result,
-                currentScreen = ScreenType.RESULTS
-            )
+            return state.copy(lastResult = result, currentScreen = ScreenType.RESULTS)
         }
         return state
     }
@@ -121,7 +113,7 @@ class ProcessingScreen : Screen {
         }
     }
 
-    private fun embed(algorithm: CarrierAlgorithm, carrierData: ByteArray, state: AppState): OperationResult {
+    private fun embed(algorithm: io.openrise.stegorouter.carrier.CarrierAlgorithm, carrierData: ByteArray, state: AppState): OperationResult {
         status = "Preparing payload..."
         progress = 0.4
 
@@ -150,7 +142,7 @@ class ProcessingScreen : Screen {
         )
     }
 
-    private fun extract(algorithm: CarrierAlgorithm, carrierData: ByteArray, state: AppState): OperationResult {
+    private fun extract(algorithm: io.openrise.stegorouter.carrier.CarrierAlgorithm, carrierData: ByteArray, state: AppState): OperationResult {
         status = "Extracting payload..."
         progress = 0.5
 
@@ -175,16 +167,16 @@ class ProcessingScreen : Screen {
         )
     }
 
-    private fun getAlgorithm(fileType: io.openrise.stegorouter.carrier.FileType): CarrierAlgorithm {
+    private fun getAlgorithm(fileType: FileType): io.openrise.stegorouter.carrier.CarrierAlgorithm {
         return when (fileType) {
-            io.openrise.stegorouter.carrier.FileType.PNG -> PngCarrier()
-            io.openrise.stegorouter.carrier.FileType.BMP -> BmpCarrier()
-            io.openrise.stegorouter.carrier.FileType.WAV -> WavCarrier()
-            io.openrise.stegorouter.carrier.FileType.ZIP -> ZipCarrier()
-            io.openrise.stegorouter.carrier.FileType.SVG -> SvgCarrier()
-            io.openrise.stegorouter.carrier.FileType.PDF -> PdfCarrier()
-            io.openrise.stegorouter.carrier.FileType.EXE -> ExeCarrier()
-            io.openrise.stegorouter.carrier.FileType.ELF -> ElfCarrier()
+            FileType.PNG -> PngCarrier()
+            FileType.BMP -> BmpCarrier()
+            FileType.WAV -> WavCarrier()
+            FileType.ZIP -> ZipCarrier()
+            FileType.SVG -> SvgCarrier()
+            FileType.PDF -> PdfCarrier()
+            FileType.EXE -> ExeCarrier()
+            FileType.ELF -> ElfCarrier()
         }
     }
 }

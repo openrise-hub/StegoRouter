@@ -79,10 +79,11 @@ class StegoRouterApp : Callable<Int> {
             return 1
         }
 
-        if (password == null) {
+        var pw = password
+        if (pw == null) {
             val config = ConfigManager.load()
-            password = config.defaultPassword
-            if (password == null) {
+            pw = config.defaultPassword
+            if (pw == null) {
                 System.err.println("Error: Password required (--password or set default in TUI)")
                 return 1
             }
@@ -106,7 +107,7 @@ class StegoRouterApp : Callable<Int> {
             carrierFile = carrierFile,
             payload = payloadData,
             payloadSource = if (payloadData != null) PayloadSource.FILE else PayloadSource.NONE,
-            password = password,
+            password = pw,
             outputFile = output,
             currentScreen = ScreenType.PROCESSING
         )
@@ -167,6 +168,6 @@ class StegoRouterApp : Callable<Int> {
 }
 
 fun main(args: Array<String>) {
-    val exitCode = CommandLine(StegoRouterApp()).execute(args)
+    val exitCode = CommandLine(StegoRouterApp()).execute(*args)
     exitProcess(exitCode)
 }

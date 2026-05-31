@@ -1,12 +1,10 @@
 package io.openrise.stegorouter.ui.screen
 
+import dev.tamboui.layout.Alignment
 import dev.tamboui.layout.Constraint
 import dev.tamboui.layout.Layout
-import dev.tamboui.style.Color
-import dev.tamboui.style.Style
 import dev.tamboui.terminal.Frame
 import dev.tamboui.text.Text
-import dev.tamboui.tui.Keys
 import dev.tamboui.tui.TuiRunner
 import dev.tamboui.tui.event.KeyEvent
 import dev.tamboui.widgets.paragraph.Paragraph
@@ -18,7 +16,6 @@ import java.awt.Frame as AwtFrame
 import java.io.File
 
 class FileSelectionScreen : Screen {
-    private var filePickerOpened = false
 
     override fun render(frame: Frame, state: AppState) {
         val chunks = Layout.vertical()
@@ -30,8 +27,8 @@ class FileSelectionScreen : Screen {
             .split(frame.area())
 
         val title = Paragraph.builder()
-            .text(Text.from("Select Carrier File").style(Style.DEFAULT.fg(Color.Cyan).bold()))
-            .alignment(dev.tamboui.layout.Alignment.CENTER)
+            .text(Text.from("Select Carrier File"))
+            .alignment(Alignment.CENTER)
             .build()
         frame.renderWidget(title, chunks[0])
 
@@ -42,14 +39,13 @@ class FileSelectionScreen : Screen {
         }
 
         val content = Paragraph.builder()
-            .text(Text.from(message).style(Style.DEFAULT.fg(Color.White)))
-            .alignment(dev.tamboui.layout.Alignment.CENTER)
+            .text(Text.from(message))
             .build()
         frame.renderWidget(content, chunks[1])
 
         val help = Paragraph.builder()
-            .text(Text.from("Enter: Select/Continue | Esc: Back").style(Style.DEFAULT.fg(Color.Gray)))
-            .alignment(dev.tamboui.layout.Alignment.CENTER)
+            .text(Text.from("Enter: Select/Continue | Esc: Back"))
+            .alignment(Alignment.CENTER)
             .build()
         frame.renderWidget(help, chunks[2])
     }
@@ -58,10 +54,10 @@ class FileSelectionScreen : Screen {
         if (event !is KeyEvent) return state
 
         return when {
-            Keys.isEscape(event) -> {
+            event.isCancel() -> {
                 state.copy(currentScreen = ScreenType.MAIN_MENU, carrierFile = null)
             }
-            Keys.isSelect(event) -> {
+            event.isSelect() -> {
                 if (state.carrierFile != null) {
                     val nextScreen = if (state.operation == Operation.EMBED) {
                         ScreenType.PAYLOAD_INPUT
