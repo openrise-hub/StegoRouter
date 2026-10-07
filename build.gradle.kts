@@ -31,7 +31,7 @@ dependencies {
     implementation("dev.tamboui:tamboui-toolkit:0.3.0")
     implementation("dev.tamboui:tamboui-jline3-backend:0.3.0")
     implementation("dev.tamboui:tamboui-picocli:0.3.0")
-    implementation("info.picocli:picocli:4.7.6")
+    implementation("info.picocli:picocli:4.7.7")
     annotationProcessor("info.picocli:picocli-codegen:4.7.6")
     
     implementation("com.google.code.gson:gson:2.10.1")
