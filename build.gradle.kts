@@ -37,7 +37,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.14.0")
     
     testImplementation(kotlin("test"))
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:6.4.0")
     testImplementation("org.assertj:assertj-core:3.27.7")
 }
 
