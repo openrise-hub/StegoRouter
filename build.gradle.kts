@@ -27,7 +27,7 @@ dependencies {
     implementation("org.bouncycastle:bcprov-jdk18on:1.78.1")
     implementation("org.bouncycastle:bcpkix-jdk18on:1.86")
     
-    implementation("dev.tamboui:tamboui-tui:0.3.0")
+    implementation("dev.tamboui:tamboui-tui:0.6.0")
     implementation("dev.tamboui:tamboui-toolkit:0.3.0")
     implementation("dev.tamboui:tamboui-jline3-backend:0.5.0")
     implementation("dev.tamboui:tamboui-picocli:0.5.0")
